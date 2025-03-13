@@ -172,15 +172,16 @@ fi
 
 # ####################### zip files ############################
 
-# Check if the file SciSciNet_Papers.zip exists in the current directory
-if [ ! -f "SciSciNet_Papers.zip" ]; then
-    echo "SciSciNet_Papers.zip not found. Downloading..."
-    wget -O SciSciNet_Papers.zip https://springernature.figshare.com/ndownloader/files/38839110
-else
-    echo "SciSciNet_Papers.zip already exists."
-fi
-echo "Unzipping SciSciNet_Papers.zip..."
-unzip -n SciSciNet_Papers.zip
+# Note: Skipping this as SciSciNet_Papers.tsv is already downloaded before
+# # Check if the file SciSciNet_Papers.zip exists in the current directory
+# if [ ! -f "SciSciNet_Papers.zip" ]; then
+#     echo "SciSciNet_Papers.zip not found. Downloading..."
+#     wget -O SciSciNet_Papers.zip https://springernature.figshare.com/ndownloader/files/38839110
+# else
+#     echo "SciSciNet_Papers.zip already exists."
+# fi
+# echo "Unzipping SciSciNet_Papers.zip..."
+# unzip -n SciSciNet_Papers.zip
 
 
 # Check if the file SciSciNet_PaperDetails.tsv.zip exists in the current directory
