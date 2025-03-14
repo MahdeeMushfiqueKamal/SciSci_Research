@@ -1,6 +1,6 @@
 ## SciSciNet_Papers
 
-134129189 lines
+13,41,29,189 lines
 
 Description: 
 ```
@@ -32,4 +32,17 @@ Tweet_Count (Integer) : The number of mentions by tweets from Twitter.
 NCT_Count (Integer) : The number of citations by clinical trials from ClinicalTrials.gov.
 NIH_Count (Integer) : The number of supporting grants from NIH.
 NSF_Count (Integer) : The number of supporting grants from NSF.
+```
+
+## SciSciNet_PaperFields
+
+27,74,94,995 lines
+
+```
+PaperID (Integer) : MAG Paper ID in the paper-field linkage record.
+FieldID (Integer) : MAG Field ID in the paper-field linkage record.
+Hit_1pct (Integer) : 1 is hit paper with top 1% total citations within the same level field and the same year, and 0 is not.
+Hit_5pct (Integer) : 1 is hit paper with top 5% total citations within the same level field and the same year, and 0 is not.
+Hit_10pct (Integer) : 1 is hit paper with top 10% total citations within the same level field and the same year, and 0 is not.
+C_f (Float) : Normalized citation as defined by Radicchi et al.
 ```
