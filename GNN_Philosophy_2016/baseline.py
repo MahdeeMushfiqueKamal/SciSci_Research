@@ -68,6 +68,8 @@ print(f"Authors shape after filtering: {authors.shape}")
 # Fill NaN values with 0 or mean depending on the feature
 authors = authors.fillna(0)
 
+print("Filled the NaN values with 0 for the author features")
+
 # Create a new dataframe that has the same order as our author_id_map
 ordered_authors = pd.DataFrame(index=range(len(author_id_map)))
 for old_id, new_id in author_id_map.items():
