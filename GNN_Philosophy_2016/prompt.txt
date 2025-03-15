@@ -1,0 +1,92 @@
+Using GNN (Graph Neural Network), I want to predict C5 (citation after 5 years) of a paper. 
+For this I want to construct a Bipartite Graph (Author on One partition and Papers on the other partition) 
+
+Let me give you the context:
+
+---
+The file author contains details of authors for both train and test
+
+authors = pd.read_csv('data/PhilosophyAuthors_2000_16_Profile.csv')
+authors.info()
+```
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 1000 entries, 0 to 999
+Data columns (total 13 columns):
+ #   Column               Non-Null Count  Dtype  
+---  ------               --------------  -----  
+ 0   AuthorID             1000 non-null   int64  
+ 1   Avg_Reference_Count  1000 non-null   float64
+ 2   Avg_Citation_Count   0 non-null      float64
+ 3   Avg_C5               1000 non-null   int64  
+ 4   Avg_Log10_C5         1000 non-null   int64  
+ 5   Max_C5               1000 non-null   int64  
+ 6   Avg_Disruption       1000 non-null   float64
+ 7   Avg_WSB_Cinf         34 non-null     float64
+ 8   Avg_WSB_mu           0 non-null      float64
+ 9   Avg_WSB_sigma        0 non-null      float64
+ 10  Avg_SB_B             34 non-null     float64
+ 11  Avg_SB_T             1000 non-null   float64
+ 12  Total_NSF_Count      0 non-null      float64
+dtypes: float64(9), int64(4)
+memory usage: 101.7 KB
+```
+
+---
+train_papers = pd.read_csv('data/PhilosophyPapers_2000_15.csv')
+train_papers.info()
+```
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 559366 entries, 0 to 559365
+Data columns (total 2 columns):
+ #   Column   Non-Null Count   Dtype
+---  ------   --------------   -----
+ 0   PaperID  559366 non-null  int64
+ 1   C5       559366 non-null  int64
+dtypes: int64(2)
+memory usage: 8.5 MB
+```
+
+---
+train_edges = pd.read_csv('data/Philosophy_2000_15_edges.csv')
+train_edges.info()
+```
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 673231 entries, 0 to 673230
+Data columns (total 2 columns):
+ #   Column    Non-Null Count   Dtype
+---  ------    --------------   -----
+ 0   AuthorID  673231 non-null  int64
+ 1   PaperID   673231 non-null  int64
+dtypes: int64(2)
+memory usage: 10.3 MB
+```
+
+---
+test_papers = pd.read_csv('data/PhilosophyPapers_2016.csv')
+test_papers.info()
+```
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 49654 entries, 0 to 49653
+Data columns (total 2 columns):
+ #   Column   Non-Null Count  Dtype
+---  ------   --------------  -----
+ 0   PaperID  49654 non-null  int64
+ 1   C5       49654 non-null  int64
+dtypes: int64(2)
+memory usage: 776.0 KB
+```
+
+---
+test_edges = pd.read_csv('data/Philosophy_2016_edges.csv')
+test_edges.info()
+```
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 61440 entries, 0 to 61439
+Data columns (total 2 columns):
+ #   Column    Non-Null Count  Dtype
+---  ------    --------------  -----
+ 0   AuthorID  61440 non-null  int64
+ 1   PaperID   61440 non-null  int64
+dtypes: int64(2)
+memory usage: 960.1 KB
+```
