@@ -1,6 +1,6 @@
 ## SciSciNet_Papers
 
-13,41,29,189 lines
+134,129,189 lines
 
 Description: 
 ```
@@ -36,7 +36,7 @@ NSF_Count (Integer) : The number of supporting grants from NSF.
 
 ## SciSciNet_PaperFields
 
-27,74,94,995 lines
+277,494,995 lines
 
 ```
 PaperID (Integer) : MAG Paper ID in the paper-field linkage record.
@@ -49,7 +49,7 @@ C_f (Float) : Normalized citation as defined by Radicchi et al.
 
 ## SciSciNet_Authors
 
-13,41,97,163 lines
+134,197,163 lines
 
 Description: 
 
@@ -60,4 +60,18 @@ H-index (Float) : A measure of an author's research impact based on citation cou
 Productivity (Float) : The author's research output
 Average_C10 (Float) : The average number of citations in the last 10 years
 Average_LogC10 (Float) : The logarithmic average of citations in the last 10 years
+```
+
+
+## SciSciNet_PaperAuthorAffiliations
+
+413,869,502 lines
+
+Description:
+
+```
+PaperID (Integer) : Unique identifier for each paper (Primary Key of the Paper table)
+AuthorID (Integer) : Unique identifier for each author (Primary Key of the Author table)
+AffiliationID (Float) : Unique identifier for the author's affiliation (Primary Key of the Affiliation table)
+AuthorSequenceNumber (Float) : The sequence number indicating the author's order in the paper
 ```

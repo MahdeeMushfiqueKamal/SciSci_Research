@@ -36,6 +36,14 @@ else
 fi
 
 
+# Check if the file SciSciNet_PaperAuthorAffiliations.tsv (11.68G) exists in the current directory
+if [ ! -f "SciSciNet_PaperAuthorAffiliations.tsv" ]; then
+    echo "SciSciNet_PaperAuthorAffiliations.tsv not found. Downloading..."
+    wget -O SciSciNet_PaperAuthorAffiliations.tsv https://springernature.figshare.com/ndownloader/files/36139278
+else
+    echo "SciSciNet_PaperAuthorAffiliations.tsv already exists."
+fi
+
 
 
 ## preprocessed up-to here
@@ -48,12 +56,6 @@ if [ ! -f "SciSciNet_Authors_Gender.tsv" ]; then
 else
     echo "SciSciNet_Authors_Gender.tsv already exists."
 fi
-
-
-
-
-
-
 
 
 # Check if the file SciSciNet_Link_Twitter.tsv exists in the current directory
@@ -89,15 +91,6 @@ if [ ! -f "SciSciNet_Newsfeed_Metadata.tsv" ]; then
     wget -O SciSciNet_Newsfeed_Metadata.tsv https://springernature.figshare.com/ndownloader/files/36139290
 else
     echo "SciSciNet_Newsfeed_Metadata.tsv already exists."
-fi
-
-
-# Check if the file SciSciNet_PaperAuthorAffiliations.tsv exists in the current directory
-if [ ! -f "SciSciNet_PaperAuthorAffiliations.tsv" ]; then
-    echo "SciSciNet_PaperAuthorAffiliations.tsv not found. Downloading..."
-    wget -O SciSciNet_PaperAuthorAffiliations.tsv https://springernature.figshare.com/ndownloader/files/36139278
-else
-    echo "SciSciNet_PaperAuthorAffiliations.tsv already exists."
 fi
 
 
