@@ -27,6 +27,17 @@ else
 fi
 
 
+# Check if the file SciSciNet_Authors.tsv (5.08 GB) exists in the current directory
+if [ ! -f "SciSciNet_Authors.tsv" ]; then
+    echo "SciSciNet_Authors.tsv not found. Downloading..."
+    wget -O SciSciNet_Authors.tsv https://springernature.figshare.com/ndownloader/files/36139323
+else
+    echo "SciSciNet_Authors.tsv already exists."
+fi
+
+
+
+
 ## preprocessed up-to here
 
 
@@ -39,13 +50,7 @@ else
 fi
 
 
-# Check if the file SciSciNet_Authors.tsv exists in the current directory
-if [ ! -f "SciSciNet_Authors.tsv" ]; then
-    echo "SciSciNet_Authors.tsv not found. Downloading..."
-    wget -O SciSciNet_Authors.tsv https://springernature.figshare.com/ndownloader/files/36139323
-else
-    echo "SciSciNet_Authors.tsv already exists."
-fi
+
 
 
 

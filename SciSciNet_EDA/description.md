@@ -46,3 +46,18 @@ Hit_5pct (Integer) : 1 is hit paper with top 5% total citations within the same 
 Hit_10pct (Integer) : 1 is hit paper with top 10% total citations within the same level field and the same year, and 0 is not.
 C_f (Float) : Normalized citation as defined by Radicchi et al.
 ```
+
+## SciSciNet_Authors
+
+13,41,97,163 lines
+
+Description: 
+
+```
+AuthorID (Integer) : Author's ID - Primary key
+Author_Name (String) : Name of Author (Can contain Unicode Character)
+H-index (Float) : A measure of an author's research impact based on citation count
+Productivity (Float) : The author's research output
+Average_C10 (Float) : The average number of citations in the last 10 years
+Average_LogC10 (Float) : The logarithmic average of citations in the last 10 years
+```
