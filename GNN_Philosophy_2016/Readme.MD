@@ -7,6 +7,8 @@ Install Pytorch Geometric:
 
 https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html
 
+For Example: 
+
 ```
 pip install torch_geometric
 
