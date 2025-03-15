@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE `sciscinet-mahdee.SciSciNet.PhilosophyAuthors_2000_16_Profile` AS
+CREATE OR REPLACE TABLE `sciscinet-mahdee.Philosophy.PhilosophyAuthors_2000_16_Profile` AS
 SELECT 
   a.AuthorID,
   AVG(Reference_Count) AS Avg_Reference_Count,
@@ -13,7 +13,7 @@ SELECT
   AVG(SB_B) AS Avg_SB_B,
   AVG(SB_T) AS Avg_SB_T,
   SUM(NSF_Count) AS Total_NSF_Count
-FROM `sciscinet-mahdee.SciSciNet.PhilosophyAuthors_2000_16` a
+FROM `sciscinet-mahdee.Philosophy.PhilosophyAuthors_2000_16` a
 INNER JOIN `sciscinet-mahdee.SciSciNet.SciSciNet_PaperAuthorAffiliations` pa
   ON a.AuthorID = pa.AuthorID 
 INNER JOIN `sciscinet-mahdee.SciSciNet.SciSciNet_Papers` p 

@@ -1,5 +1,5 @@
-CREATE OR REPLACE TABLE `sciscinet-mahdee.SciSciNet.PhilosophyPapers_2000_15` AS
-SELECT p.PaperID 
+CREATE OR REPLACE TABLE `sciscinet-mahdee.Philosophy.PhilosophyPapers_2000_15` AS
+SELECT p.PaperID, p.C5
 FROM `sciscinet-mahdee.SciSciNet.SciSciNet_Papers` p  
 INNER JOIN `sciscinet-mahdee.SciSciNet.SciSciNet_PaperFields` pf 
     ON p.PaperID = pf.PaperID 
