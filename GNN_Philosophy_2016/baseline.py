@@ -6,9 +6,11 @@ from torch_geometric.data import HeteroData
 from torch_geometric.nn import HeteroConv, GCNConv, SAGEConv, Linear
 from torch_geometric.loader import DataLoader
 from sklearn.metrics import mean_squared_error, mean_absolute_error
-from sklearn.model_selection import train_test_split
 import time
 import gc
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
 
 print("Starting data loading...")
 start_time = time.time()
@@ -317,7 +319,7 @@ best_test_rmse = float('inf')
 no_improve = 0
 
 # Create a mini-batch sampler if memory is still an issue
-batch_size = 2048  # Adjust based on your GPU memory
+batch_size = 524288  # Adjust based on your GPU memory
 train_indices_list = train_paper_indices.split(batch_size)
 total_batches = len(train_indices_list)
 
