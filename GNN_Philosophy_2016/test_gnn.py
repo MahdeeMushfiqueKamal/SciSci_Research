@@ -272,29 +272,61 @@ def main():
     # Make predictions
     with torch.no_grad():
         paper_pred = model(x_dict, edge_index_dict)
-        test_pred = paper_pred[test_paper_indices].squeeze()
+        test_pred_raw = paper_pred[test_paper_indices].squeeze()
+        
+        # Apply constraints: non-negative and rounded to integers
+        test_pred_nonneg = torch.clamp(test_pred_raw, min=0.0)  # Ensure non-negative
+        test_pred = torch.round(test_pred_nonneg)  # Round to nearest integer
         
         # Calculate test metrics
-        test_loss = F.mse_loss(test_pred, test_y)
+        # Using raw predictions for loss calculation
+        test_loss = F.mse_loss(test_pred_raw, test_y)
         
         # Move tensors to CPU for numpy operations
         test_rmse = mean_squared_error(test_y.cpu().numpy(), test_pred.cpu().numpy(), squared=False)
         test_mae = mean_absolute_error(test_y.cpu().numpy(), test_pred.cpu().numpy())
         
-        print(f"Test Loss: {test_loss.item():.4f}")
-        print(f"Test RMSE: {test_rmse:.4f}")
-        print(f"Test MAE: {test_mae:.4f}")
+        print(f"Test Loss (raw predictions): {test_loss.item():.4f}")
+        print(f"Test RMSE (rounded, non-negative): {test_rmse:.4f}")
+        print(f"Test MAE (rounded, non-negative): {test_mae:.4f}")
+        
+        # Calculate metrics on raw predictions for comparison
+        raw_rmse = mean_squared_error(test_y.cpu().numpy(), test_pred_raw.cpu().numpy(), squared=False)
+        raw_mae = mean_absolute_error(test_y.cpu().numpy(), test_pred_raw.cpu().numpy())
+        print(f"Raw prediction RMSE: {raw_rmse:.4f}")
+        print(f"Raw prediction MAE: {raw_mae:.4f}")
         
         # Create dataframe for test predictions
         test_predictions = pd.DataFrame({
             'PaperID': original_paper_ids,
             'Actual_C5': test_y.cpu().numpy(),
+            'Predicted_C5_Raw': test_pred_raw.cpu().numpy(),
             'Predicted_C5': test_pred.cpu().numpy()
         })
+        
+        # Calculate error metrics
+        test_predictions['Absolute_Error'] = abs(test_predictions['Actual_C5'] - test_predictions['Predicted_C5'])
+        test_predictions['Squared_Error'] = (test_predictions['Actual_C5'] - test_predictions['Predicted_C5'])**2
         
         # Save predictions
         test_predictions.to_csv('citation_predictions.csv', index=False)
         print("Predictions saved to citation_predictions.csv")
+        
+        # Print summary statistics
+        print("\nSummary Statistics:")
+        print(f"Mean Actual Citations: {test_predictions['Actual_C5'].mean():.2f}")
+        print(f"Mean Predicted Citations: {test_predictions['Predicted_C5'].mean():.2f}")
+        print(f"Max Actual Citations: {test_predictions['Actual_C5'].max():.0f}")
+        print(f"Max Predicted Citations: {test_predictions['Predicted_C5'].max():.0f}")
+        
+        # Calculate relative error
+        mask = test_predictions['Actual_C5'] > 0  # Avoid division by zero
+        if mask.sum() > 0:
+            relative_error = (
+                abs(test_predictions.loc[mask, 'Actual_C5'] - test_predictions.loc[mask, 'Predicted_C5']) / 
+                test_predictions.loc[mask, 'Actual_C5']
+            )
+            print(f"Mean Relative Error: {relative_error.mean():.4f}")
 
 if __name__ == "__main__":
     main()

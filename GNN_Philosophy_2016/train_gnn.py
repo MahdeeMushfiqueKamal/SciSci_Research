@@ -8,6 +8,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 import time
 import gc
 import os
+import pickle
 
 # Check for CUDA availability
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -250,6 +251,11 @@ class BipartiteCitationGNN(torch.nn.Module):
         paper_x = F.relu(self.lin1(paper_x))
         paper_x = self.lin2(paper_x)
         
+        # Ensure outputs are non-negative (during training for better learning)
+        # But don't apply rounding during training (only in inference)
+        if not self.training:
+            paper_x = torch.clamp(paper_x, min=0.0)
+            
         return paper_x
 
 # Create dictionaries for model input
@@ -278,6 +284,23 @@ val_paper_indices = val_paper_indices.to(device)
 train_y = train_y.to(device)
 val_y = val_y.to(device)
 
+# Custom loss function for citation prediction
+# This is a modified MSE loss that puts more penalty on underestimating citations
+def citation_aware_loss(pred, target, alpha=1.2):
+    # Standard MSE
+    mse = F.mse_loss(pred, target, reduction='none')
+    
+    # Calculate directional penalties
+    # Penalty for underestimation (pred < target) is higher
+    under_pred = pred < target
+    directional_penalty = torch.ones_like(mse)
+    directional_penalty[under_pred] = alpha  # Increase penalty for underestimation
+    
+    # Apply directional penalty
+    weighted_mse = mse * directional_penalty
+    
+    return weighted_mse.mean()
+
 # Define optimizer with learning rate scheduler and weight decay
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=1e-5)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10)
@@ -287,11 +310,16 @@ def evaluate():
     model.eval()
     with torch.no_grad():
         paper_pred = model(x_dict, edge_index_dict)
-        train_pred = paper_pred[train_paper_indices].squeeze()
-        val_pred = paper_pred[val_paper_indices].squeeze()
+        train_pred_raw = paper_pred[train_paper_indices].squeeze()
+        val_pred_raw = paper_pred[val_paper_indices].squeeze()
         
-        train_loss = F.mse_loss(train_pred, train_y)
-        val_loss = F.mse_loss(val_pred, val_y)
+        # Calculate loss using raw predictions
+        train_loss = citation_aware_loss(train_pred_raw, train_y)
+        val_loss = citation_aware_loss(val_pred_raw, val_y)
+        
+        # Apply non-negative and rounding for evaluation metrics
+        train_pred = torch.round(torch.clamp(train_pred_raw, min=0.0))
+        val_pred = torch.round(torch.clamp(val_pred_raw, min=0.0))
         
         # Move tensors to CPU for numpy operations
         train_rmse = mean_squared_error(train_y.cpu().numpy(), train_pred.cpu().numpy(), squared=False)
@@ -300,7 +328,11 @@ def evaluate():
         train_mae = mean_absolute_error(train_y.cpu().numpy(), train_pred.cpu().numpy())
         val_mae = mean_absolute_error(val_y.cpu().numpy(), val_pred.cpu().numpy())
         
-    return train_loss.item(), val_loss.item(), train_rmse, val_rmse, train_mae, val_mae
+        # Also calculate raw metrics (before rounding) for comparison
+        train_rmse_raw = mean_squared_error(train_y.cpu().numpy(), train_pred_raw.cpu().numpy(), squared=False)
+        val_rmse_raw = mean_squared_error(val_y.cpu().numpy(), val_pred_raw.cpu().numpy(), squared=False)
+        
+    return train_loss.item(), val_loss.item(), train_rmse, val_rmse, train_mae, val_mae, train_rmse_raw, val_rmse_raw
 
 # Create directory for model
 os.makedirs('models', exist_ok=True)
@@ -333,7 +365,8 @@ for epoch in range(1, epochs + 1):
         
         # Calculate loss on batch
         batch_y = train_y[batch_idx * batch_size: min((batch_idx + 1) * batch_size, len(train_y))]
-        loss = F.mse_loss(paper_pred[batch_indices].squeeze(), batch_y)
+        # Use custom citation-aware loss
+        loss = citation_aware_loss(paper_pred[batch_indices].squeeze(), batch_y)
         
         # Backward pass
         loss.backward()
@@ -352,13 +385,14 @@ for epoch in range(1, epochs + 1):
     # Evaluate every 5 epochs
     if epoch % 5 == 0:
         eval_start = time.time()
-        train_loss, val_loss, train_rmse, val_rmse, train_mae, val_mae = evaluate()
+        train_loss, val_loss, train_rmse, val_rmse, train_mae, val_mae, train_rmse_raw, val_rmse_raw = evaluate()
         
         print(f'Epoch: {epoch:03d}, Time: {time.time() - epoch_start:.2f}s, '
               f'Eval Time: {time.time() - eval_start:.2f}s')
         print(f'Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
-        print(f'Train RMSE: {train_rmse:.4f}, Val RMSE: {val_rmse:.4f}')
+        print(f'Train RMSE (rounded): {train_rmse:.4f}, Val RMSE (rounded): {val_rmse:.4f}')
         print(f'Train MAE: {train_mae:.4f}, Val MAE: {val_mae:.4f}')
+        print(f'Train RMSE (raw): {train_rmse_raw:.4f}, Val RMSE (raw): {val_rmse_raw:.4f}')
         
         # Update learning rate based on validation performance
         scheduler.step(val_rmse)
@@ -371,6 +405,7 @@ for epoch in range(1, epochs + 1):
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'val_rmse': val_rmse,
+                'val_rmse_raw': val_rmse_raw,
                 'author_id_map': author_id_map,
                 'paper_id_map': paper_id_map,
                 'author_in_channels': author_in_channels,

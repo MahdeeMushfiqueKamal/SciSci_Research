@@ -150,7 +150,7 @@ def create_binned_data(df, max_bin=50):
     bin_df = pd.DataFrame(bin_data)
     return bin_df
 
-def create_visualizations(df, bin_df, output_dir='plots'):
+def create_visualizations(df, bin_df, output_dir='plots_natural_scale'):
     """Create various visualizations to analyze the prediction data."""
     print(f"\nCreating visualizations in '{output_dir}' directory...")
     
@@ -161,30 +161,49 @@ def create_visualizations(df, bin_df, output_dir='plots'):
     sns.set(style="whitegrid")
     plt.rcParams.update({'font.size': 12})
     
-    # 1. Actual vs Predicted scatter plot (sample for readability)
+    # 1. Binned error heatmap (switching axes to have Actual on X-axis)
     plt.figure(figsize=(10, 8))
-    
-    # Sample the data if there are too many points
-    sample_size = 1000 if len(df) > 1000 else len(df)
-    sample_df = df.sample(sample_size) if len(df) > sample_size else df
-    
-    # Create scatter plot
-    ax = sns.scatterplot(x='Actual_C5', y='Predicted_C5', data=sample_df, alpha=0.6)
-    
-    # Add perfect prediction line
-    max_val = max(df['Actual_C5'].max(), df['Predicted_C5'].max())
-    perfect_line = np.linspace(0, min(50, max_val), 100)
-    plt.plot(perfect_line, perfect_line, 'r--', label='Perfect Prediction')
-    
-    # Limit axes for better visibility
-    plt.xlim(-1, 50)
-    plt.ylim(-1, 50)
-    
-    plt.title('Actual vs. Predicted Citations')
-    plt.xlabel('Actual Citations')
-    plt.ylabel('Predicted Citations')
-    plt.legend()
-    plt.savefig(f"{output_dir}/actual_vs_predicted.png", dpi=300, bbox_inches='tight')
+
+    # Calculate error for the visualization
+    df['Error'] = df['Predicted_C5'] - df['Actual_C5']
+
+    # Create bins for actual citations
+    max_citation = 75
+    df['ActualBin'] = pd.cut(df['Actual_C5'], 
+                            bins=list(range(0, max_citation+5, 5)), 
+                            labels=[f"{i}-{i+4}" for i in range(0, max_citation, 5)])
+
+    # Create bins for predicted citations
+    df['PredictedBin'] = pd.cut(df['Predicted_C5'], 
+                            bins=list(range(0, max_citation+5, 5)), 
+                            labels=[f"{i}-{i+4}" for i in range(0, max_citation, 5)])
+
+    # Count papers in each bin combination - switched order to have Actual on X-axis
+    error_heatmap = pd.crosstab(df['PredictedBin'], df['ActualBin'])
+
+    # Define the specific order we want (0-4 at bottom, increasing upward)
+    citation_order = [f"{i}-{i+4}" for i in range(0, max_citation, 5)]
+
+    # Reorder both rows and columns of the heatmap
+    error_heatmap = error_heatmap.reindex(citation_order)
+    error_heatmap = error_heatmap.reindex(columns=citation_order)
+
+    # Plot the heatmap with the correct orientation
+    ax = sns.heatmap(error_heatmap, annot=True, cmap='Blues', fmt='d', 
+                cbar_kws={'label': 'Number of Papers'})
+
+    # Invert the y-axis to put 0-4 at the bottom
+    ax.invert_yaxis()
+
+    # Add diagonal line to indicate perfect prediction bins
+    # Draw line from bottom-left to top-right to represent perfect prediction
+    plt.plot([0, len(error_heatmap.columns)], [0, len(error_heatmap.index)], 'r--', linewidth=2, label='Perfect Prediction')
+
+    plt.title('Predicted vs. Actual Citations')
+    plt.xlabel('Actual Citation Range')
+    plt.ylabel('Predicted Citation Range')
+    plt.tight_layout()
+    plt.savefig(f"{output_dir}/predicted_vs_actual.png", dpi=300, bbox_inches='tight')
     plt.close()
     
     # 2. Error distribution histogram
