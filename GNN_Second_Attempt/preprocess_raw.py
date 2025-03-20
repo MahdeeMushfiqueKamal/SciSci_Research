@@ -5,11 +5,20 @@ author_df = pd.read_csv('data_raw/Philosophy_2016_Author_Profiles.csv')
 papers_df = pd.read_csv('data_raw/Philosophy_2016_Papers.csv')
 edges_df = pd.read_csv('data_raw/Philosophy_2016_Edges.csv')
 
+
+# ############### Experiment 1: Remove authors whose first paper (First_Publication_Year) is in 2016 ###############
+# author_df = author_df[author_df['First_Publication_Year'] != 2016]
+# author_ids = set(author_df['AuthorID'])
+# edges_df = edges_df[edges_df['AuthorID'].isin(author_ids)]
+# paper_ids = set(edges_df['PaperID'])
+# papers_df = papers_df[papers_df['PaperID'].isin(paper_ids)]
+# ##################################################################################################################
+
+# Write the author dataset to a CSV file
+author_df.to_csv('data/Philosophy_2016_Author_Profiles.csv', index=False)
+
 np.random.seed(42)
 random_values = np.random.rand(len(papers_df))
-
-# Write the author dataset to a CSV file - No Feature Engineering
-author_df.to_csv('data/Philosophy_2016_Author_Profiles.csv', index=False)
 
 # Create masks for train (60%), validation (30%), and test (10%)
 train_mask = random_values < 0.6
