@@ -9,6 +9,19 @@ import time
 import gc
 import pickle
 import os
+import warnings
+
+warnings.filterwarnings("ignore")
+
+# Set seed for reproducibility
+seed_value = 42
+np.random.seed(seed_value)
+torch.manual_seed(seed_value)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed(seed_value)
+    torch.cuda.manual_seed_all(seed_value)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
 
 # Check for CUDA availability
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -283,7 +296,7 @@ def main():
         test_loss = F.mse_loss(test_pred_raw, test_y)
         
         # Move tensors to CPU for numpy operations
-        test_rmse = mean_squared_error(test_y.cpu().numpy(), test_pred.cpu().numpy(), squared=False)
+        test_rmse = mean_squared_error(test_y.cpu().numpy(), test_pred.cpu().numpy())
         test_mae = mean_absolute_error(test_y.cpu().numpy(), test_pred.cpu().numpy())
         
         print(f"Test Loss (raw predictions): {test_loss.item():.4f}")
@@ -291,7 +304,7 @@ def main():
         print(f"Test MAE (rounded, non-negative): {test_mae:.4f}")
         
         # Calculate metrics on raw predictions for comparison
-        raw_rmse = mean_squared_error(test_y.cpu().numpy(), test_pred_raw.cpu().numpy(), squared=False)
+        raw_rmse = mean_squared_error(test_y.cpu().numpy(), test_pred_raw.cpu().numpy())
         raw_mae = mean_absolute_error(test_y.cpu().numpy(), test_pred_raw.cpu().numpy())
         print(f"Raw prediction RMSE: {raw_rmse:.4f}")
         print(f"Raw prediction MAE: {raw_mae:.4f}")

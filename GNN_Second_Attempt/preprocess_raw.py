@@ -1,11 +1,15 @@
 import pandas as pd
 import numpy as np
 
-papers_df = pd.read_csv('Philosophy_2016_Papers.csv')
-edges_df = pd.read_csv('Philosophy_2016_Edges.csv')
+author_df = pd.read_csv('data_raw/Philosophy_2016_Author_Profiles.csv')
+papers_df = pd.read_csv('data_raw/Philosophy_2016_Papers.csv')
+edges_df = pd.read_csv('data_raw/Philosophy_2016_Edges.csv')
 
 np.random.seed(42)
 random_values = np.random.rand(len(papers_df))
+
+# Write the author dataset to a CSV file - No Feature Engineering
+author_df.to_csv('data/Philosophy_2016_Author_Profiles.csv', index=False)
 
 # Create masks for train (60%), validation (30%), and test (10%)
 train_mask = random_values < 0.6
@@ -18,9 +22,9 @@ papers_validation = papers_df[validation_mask]
 papers_test = papers_df[test_mask]
 
 # Save papers datasets
-papers_train.to_csv('PhilosophyPapers_2016_train.csv', index=False)
-papers_validation.to_csv('PhilosophyPapers_2016_validation.csv', index=False)
-papers_test.to_csv('PhilosophyPapers_2016_test.csv', index=False)
+papers_train.to_csv('data/PhilosophyPapers_2016_train.csv', index=False)
+papers_validation.to_csv('data/PhilosophyPapers_2016_validation.csv', index=False)
+papers_test.to_csv('data/PhilosophyPapers_2016_test.csv', index=False)
 
 # Get paper IDs for each set
 train_paper_ids = set(papers_train['PaperID'])
@@ -33,9 +37,9 @@ edges_validation = edges_df[edges_df['PaperID'].isin(validation_paper_ids)]
 edges_test = edges_df[edges_df['PaperID'].isin(test_paper_ids)]
 
 # Save edges datasets
-edges_train.to_csv('Philosophy_2016_edges_train.csv', index=False)
-edges_validation.to_csv('Philosophy_2016_edges_validation.csv', index=False)
-edges_test.to_csv('Philosophy_2016_edges_test.csv', index=False)
+edges_train.to_csv('data/Philosophy_2016_edges_train.csv', index=False)
+edges_validation.to_csv('data/Philosophy_2016_edges_validation.csv', index=False)
+edges_test.to_csv('data/Philosophy_2016_edges_test.csv', index=False)
 
 # Print statistics
 print(f"Papers total: {len(papers_df)}")

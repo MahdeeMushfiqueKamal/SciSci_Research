@@ -9,6 +9,9 @@ import time
 import gc
 import os
 import pickle
+import warnings
+
+warnings.filterwarnings("ignore")
 
 # Check for CUDA availability
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -322,15 +325,15 @@ def evaluate():
         val_pred = torch.round(torch.clamp(val_pred_raw, min=0.0))
         
         # Move tensors to CPU for numpy operations
-        train_rmse = mean_squared_error(train_y.cpu().numpy(), train_pred.cpu().numpy(), squared=False)
-        val_rmse = mean_squared_error(val_y.cpu().numpy(), val_pred.cpu().numpy(), squared=False)
+        train_rmse = mean_squared_error(train_y.cpu().numpy(), train_pred.cpu().numpy())
+        val_rmse = mean_squared_error(val_y.cpu().numpy(), val_pred.cpu().numpy())
         
         train_mae = mean_absolute_error(train_y.cpu().numpy(), train_pred.cpu().numpy())
         val_mae = mean_absolute_error(val_y.cpu().numpy(), val_pred.cpu().numpy())
         
         # Also calculate raw metrics (before rounding) for comparison
-        train_rmse_raw = mean_squared_error(train_y.cpu().numpy(), train_pred_raw.cpu().numpy(), squared=False)
-        val_rmse_raw = mean_squared_error(val_y.cpu().numpy(), val_pred_raw.cpu().numpy(), squared=False)
+        train_rmse_raw = mean_squared_error(train_y.cpu().numpy(), train_pred_raw.cpu().numpy())
+        val_rmse_raw = mean_squared_error(val_y.cpu().numpy(), val_pred_raw.cpu().numpy())
         
     return train_loss.item(), val_loss.item(), train_rmse, val_rmse, train_mae, val_mae, train_rmse_raw, val_rmse_raw
 
@@ -428,7 +431,7 @@ print(f"\nTraining completed. Best validation RMSE: {best_val_rmse:.4f}")
 print(f"Best model saved to {model_save_path}")
 
 # Save the mapping dictionaries for test inference
-import pickle
+
 with open('models/id_mappings.pkl', 'wb') as f:
     pickle.dump({
         'author_id_map': author_id_map,

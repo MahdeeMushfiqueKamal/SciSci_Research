@@ -52,6 +52,7 @@ def calculate_statistics(df):
         'Mean Absolute Error': (df['Actual_C5'] - df['Predicted_C5']).abs().mean(),
         'Median Absolute Error': (df['Actual_C5'] - df['Predicted_C5']).abs().median(),
         'Root Mean Square Error': np.sqrt(((df['Actual_C5'] - df['Predicted_C5']) ** 2).mean()),
+        'Accuracy (within ±1)': (abs(df['Actual_C5'] - df['Predicted_C5']) <= 1).mean() * 100,
         'Accuracy (within ±10)': (abs(df['Actual_C5'] - df['Predicted_C5']) <= 10).mean() * 100
     }
     
@@ -73,15 +74,16 @@ def print_statistics(stats_dict):
     print(f"Maximum Actual Citations: {stats_dict['Max Actual Citations']:.0f}")
     print(f"Average Predicted Citations: {stats_dict['Mean Predicted Citations']:.2f}")
     print(f"Median Predicted Citations: {stats_dict['Median Predicted Citations']:.1f}")
-    print(f"Maximum Predicted Citations: {stats_dict['Max Predicted Citations']:.0f}")
-    print(f"Correlation: {stats_dict['Correlation']:.3f}")
+    print(f"Maximum Predicted Citations: {stats_dict['Max Predicted Citations']:.0f}")  
     
     # Prediction performance
     print("\nPREDICTION PERFORMANCE:")
     print(f"Mean Absolute Error: {stats_dict['Mean Absolute Error']:.2f}")
     print(f"Median Absolute Error: {stats_dict['Median Absolute Error']:.2f}")
     print(f"Root Mean Square Error: {stats_dict['Root Mean Square Error']:.2f}")
+    print(f"Accuracy (within ±1): {stats_dict['Accuracy (within ±1)']:.2f}%")
     print(f"Accuracy (within ±10): {stats_dict['Accuracy (within ±10)']:.2f}%")
+    print(f"Correlation: {stats_dict['Correlation']:.3f}")
 
 def analyze_extreme_cases(df):
     """Find and analyze papers with extreme prediction errors."""
