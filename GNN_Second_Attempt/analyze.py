@@ -281,7 +281,7 @@ def main():
         # Load the data
         df = load_data(file_path)
         
-        # Calculate statistics
+        # Calculate statisticsa
         stats = calculate_statistics(df)
         
         # Print statistics

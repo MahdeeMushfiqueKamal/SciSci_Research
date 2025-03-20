@@ -13,6 +13,16 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
+# Set seed for reproducibility
+seed_value = 42
+np.random.seed(seed_value)
+torch.manual_seed(seed_value)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed(seed_value)
+    torch.cuda.manual_seed_all(seed_value)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
 # Check for CUDA availability
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
