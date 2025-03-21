@@ -28,6 +28,15 @@ paper_ids = set(edges_df["PaperID"])
 papers_df = papers_df[papers_df["PaperID"].isin(paper_ids)]
 ####################################################################
 
+
+############### Experiment 4: Remove Papers with Very High Citation ###############
+papers_df = papers_df[papers_df["C5"] < 21]
+paper_ids = set(papers_df["PaperID"])
+edges_df = edges_df[edges_df["PaperID"].isin(paper_ids)]
+author_ids = set(edges_df["AuthorID"])
+author_df = author_df[author_df["AuthorID"].isin(author_ids)]
+####################################################################
+
 # Write the author dataset to a CSV file
 author_df.to_csv("data/Philosophy_2016_Author_Profiles.csv", index=False)
 
