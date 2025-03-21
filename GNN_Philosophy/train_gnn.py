@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.discriminant_analysis import StandardScaler
 import torch
 import torch.nn.functional as F
 from torch_geometric.data import HeteroData
@@ -110,6 +111,10 @@ author_features_df = authors.drop(['AuthorID', 'new_idx'], axis=1)
 
 # Convert to tensor
 author_features = torch.tensor(author_features_df.values, dtype=torch.float)
+
+scaler = StandardScaler()
+author_features_scaled = scaler.fit_transform(author_features_df)
+author_features = torch.tensor(author_features_scaled, dtype=torch.float)
 print(f"Author features shape: {author_features.shape}")
 
 print(f"Author feature processing completed in {time.time() - start_time:.2f} seconds")

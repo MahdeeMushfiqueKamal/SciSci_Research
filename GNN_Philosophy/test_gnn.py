@@ -5,6 +5,7 @@ import torch.nn.functional as F
 from torch_geometric.data import HeteroData
 from torch_geometric.nn import HeteroConv, GCNConv, SAGEConv, Linear
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.preprocessing import StandardScaler
 import time
 import gc
 import pickle
@@ -176,9 +177,14 @@ def main():
     # Drop the AuthorID and new_idx columns to get just the features
     author_features_df = authors.drop(['AuthorID', 'new_idx'], axis=1)
     
-    # Convert to tensor
-    author_features = torch.tensor(author_features_df.values, dtype=torch.float)
+    # Standardize the features (mean=0, std=1)
+    scaler = StandardScaler()
+    author_features_scaled = scaler.fit_transform(author_features_df)
+    
+    # Convert to tensor using the standardized features
+    author_features = torch.tensor(author_features_scaled, dtype=torch.float)
     print(f"Author features shape: {author_features.shape}")
+    print("Features standardized with StandardScaler")
     
     print(f"Author feature processing completed in {time.time() - start_time:.2f} seconds")
 
